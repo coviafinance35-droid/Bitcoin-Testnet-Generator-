@@ -1,0 +1,68 @@
+# GitHub Actions Workflow for CI/CD
+# This handles both the backend and frontend builds, testing, and deployment.
+
+name: Frontend-Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Backend CI/CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Backend Tests
+        run: |
+          python -m unittest discover -s tests
+
+      - name: Deploy Backend
+        env:
+          DEPLOY_API_KEY: ${{ secrets.DEPLOY_API_KEY }}
+        run: |
+          echo "Backend would be deployed here using the server API."
+
+  frontend:
+    name: Frontend CI/CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run Frontend Tests
+        run: |
+          cd frontend
+          npm test
+
+      - name: Deploy Frontend
+        env:
+          FRONTEND_API_KEY: ${{ secrets.FRONTEND_API_KEY }}
+        run: |
+          echo "Frontend would be deployed here. For example, Vercel deployment actions."
