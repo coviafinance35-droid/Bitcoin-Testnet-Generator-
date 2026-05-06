@@ -1,6 +1,4 @@
-# GitHub Actions Workflow for CI/CD
-# This handles both the backend and frontend builds, testing, and deployment.
-
+# Fixed GitHub Actions workflow for CI/CD with correct syntax and validations.
 name: Frontend-Backend CI/CD
 
 on:
@@ -11,42 +9,53 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  id-token: write
+  # Ensure GitHub Actions has permissions to access the repository and secrets.
+
 jobs:
   backend:
     name: Backend CI/CD
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python Environment
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
 
       - name: Run Backend Tests
         run: |
           python -m unittest discover -s tests
 
       - name: Deploy Backend
+        if: success()
         env:
           DEPLOY_API_KEY: ${{ secrets.DEPLOY_API_KEY }}
         run: |
-          echo "Backend would be deployed here using the server API."
+          echo "Deploying backend to production... [Add actual deployment steps here.]"
 
   frontend:
     name: Frontend CI/CD
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Set up Node.js
+      - name: Set up Node Environment
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -62,7 +71,8 @@ jobs:
           npm test
 
       - name: Deploy Frontend
+        if: success()
         env:
           FRONTEND_API_KEY: ${{ secrets.FRONTEND_API_KEY }}
         run: |
-          echo "Frontend would be deployed here. For example, Vercel deployment actions."
+          echo "Deploying frontend... [Add Vercel or other deployment steps here.]"
