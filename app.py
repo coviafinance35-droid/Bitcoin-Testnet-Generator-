@@ -8,8 +8,8 @@ app = Flask(__name__)
 MIN_BTC = 1 * 10**8  # 1 BTC = 100,000,000 satoshis
 MAX_BTC = 10 * 10**8  # 10 BTC = 1,000,000,000 satoshis
 
-# Setting up the Bitcoin Testnet network
-Network('bitcoin_testnet')
+# Setting up the Bitcoin Testnet4 network
+Network('testnet4')
 
 @app.route('/generate_wallet', methods=['POST'])
 def generate_wallet():
@@ -18,7 +18,7 @@ def generate_wallet():
     """
     wallet_name = 'testnet_wallet'
     wallet_delete(wallet_name)  # Clean up old wallet with the same name (for testing)
-    wallet = Wallet.create(wallet_name, network='bitcoin_testnet')
+    wallet = Wallet.create(wallet_name, network='testnet4')
     address = wallet.get_key().address
     private_key = wallet.get_key().private_hex
 
@@ -43,7 +43,7 @@ def send_transaction():
         return jsonify({"error": "Transaction amount must be between 1 BTC and 10 BTC"}), 400
 
     # Load the sender wallet from the private key (Use existing wallet)
-    sender_wallet = Wallet(network='bitcoin_testnet').from_key(sender_private_key)
+    sender_wallet = Wallet(network='testnet4').from_key(sender_private_key)
 
     # Create and send the transaction
     tx = sender_wallet.send_to(recipient_address, amount_satoshis)
@@ -62,7 +62,7 @@ def check_balance():
     wallet_name = request.args.get('wallet_name')
 
     # Load wallet and check balance
-    wallet = Wallet(wallet_name, network='bitcoin_testnet')
+    wallet = Wallet(wallet_name, network='testnet4')
     balance = wallet.balance(as_text=True)
 
     return jsonify({
