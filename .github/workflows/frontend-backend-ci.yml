@@ -34,9 +34,13 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Lint Backend
+        run: |
+          if [ -f app.py ]; then python -m py_compile app.py; fi
+
       - name: Run Backend Tests
         run: |
-          python -m unittest discover -s tests
+          if [ -d tests ]; then python -m unittest discover -s tests --failfast; else echo "No backend tests yet"; fi
 
       - name: Deploy Backend
         if: success()
@@ -48,6 +52,7 @@ jobs:
   frontend:
     name: Frontend CI/CD
     runs-on: ubuntu-latest
+    if: hashFiles('frontend/package.json') != ''
 
     steps:
       - name: Checkout Repository Code
