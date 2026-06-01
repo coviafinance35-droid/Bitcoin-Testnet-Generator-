@@ -1,5 +1,5 @@
 # CI/CD workflow for Bitcoin Testnet Generator backend
-name: Frontend-Backend CI/CD
+name: Backend CI/CD
 
 on:
   push:
@@ -39,10 +39,11 @@ jobs:
 
       - name: Run Backend Tests
         run: |
-          if [ -d tests ] && [ -n "$(ls -A tests/*.py 2>/dev/null | grep -c test_)" ]; then
+          TEST_FILES=$(find tests -name "test_*.py" -type f 2>/dev/null)
+          if [ -n "$TEST_FILES" ]; then
             python -m unittest discover -s tests --failfast
           else
-            echo "No backend tests yet"
+            echo "No backend tests found"
           fi
 
       - name: Deploy Backend
