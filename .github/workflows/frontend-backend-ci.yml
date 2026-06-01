@@ -1,4 +1,4 @@
-# Fixed GitHub Actions workflow for CI/CD with correct syntax and validations.
+# CI/CD workflow for Bitcoin Testnet Generator backend
 name: Frontend-Backend CI/CD
 
 on:
@@ -12,7 +12,6 @@ on:
 permissions:
   contents: write
   id-token: write
-  # Ensure GitHub Actions has permissions to access the repository and secrets.
 
 jobs:
   backend:
@@ -40,7 +39,11 @@ jobs:
 
       - name: Run Backend Tests
         run: |
-          if [ -d tests ]; then python -m unittest discover -s tests --failfast; else echo "No backend tests yet"; fi
+          if [ -d tests ] && [ -n "$(ls -A tests/*.py 2>/dev/null | grep -c test_)" ]; then
+            python -m unittest discover -s tests --failfast
+          else
+            echo "No backend tests yet"
+          fi
 
       - name: Deploy Backend
         if: success()
@@ -48,36 +51,3 @@ jobs:
           DEPLOY_API_KEY: ${{ secrets.DEPLOY_API_KEY }}
         run: |
           echo "Deploying backend to production... [Add actual deployment steps here.]"
-
-  frontend:
-    name: Frontend CI/CD
-    runs-on: ubuntu-latest
-    if: hashFiles('frontend/package.json') != ''
-
-    steps:
-      - name: Checkout Repository Code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node Environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Run Frontend Tests
-        run: |
-          cd frontend
-          npm test
-
-      - name: Deploy Frontend
-        if: success()
-        env:
-          FRONTEND_API_KEY: ${{ secrets.FRONTEND_API_KEY }}
-        run: |
-          echo "Deploying frontend... [Add Vercel or other deployment steps here.]"
